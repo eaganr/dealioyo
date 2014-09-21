@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+	{% if headline %}
+		<div class="story-title">{{story.title}}</div>
+		<div class="headline-title">{{headline.title}}</div>
+		<div class="headline-date">{{headline.date}}</div>
+		<div class="headline-description">{{headline.description|linebreaksbr}}</div>
+		{% include "story/timeline.html" %}
+	{% else %}
+		<div class="not-found">No Story With This Name</div>
+	{% endif %}
+{% endblock %}
