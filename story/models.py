@@ -1,5 +1,7 @@
 from django.db import models
 
+import datetime
+
 # Create your models here.
 
 class Story(models.Model):
@@ -13,6 +15,18 @@ class Story(models.Model):
 
 	def keywords(self):
 		return Keyword.objects.filter(story=self)
+
+	def todays_links(self):
+		start_time = datetime.datetime.now() + datetime.timedelta(hours=-24)
+		story_links = StoryLink.objects.filter(hour_count_source__hour_count__story=self, date__gt=start_time)
+		return story_links
+
+	def todays_links_urls(self):
+		story_links = self.todays_links()
+		urls = []
+		for sl in story_links:
+			urls.append(sl.url)
+		return urls
 
 
 class Keyword(models.Model):

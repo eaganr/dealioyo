@@ -30,29 +30,30 @@ def count_rss(hour_count_source):
 
 		if in_last_hour(the_time):
 			link = item.find("link").text
-			try:
-				html = str(opener.open(link).read()).lower().decode('utf-8')
-			except BadStatusLine:
-				html = ""
-			except UnicodeDecodeError:
-				html = ""
-			if hour_count_source.source.start_text in html:
-				html = html.split(hour_count_source.source.start_text, 1)[1]
-			if hour_count_source.source.end_text in html:
-				html = html.split(hour_count_source.source.end_text, 1)[0]
-			print link
-			if html != "":
-				for kw in hour_count_source.hour_count.story.keywords():
-					if " " + kw.keyword in html:
-						count += 1
-						print kw.keyword
-						# add as StoryLink
-						sl = StoryLink(url=link,
-									   date=the_time,
-									   title=item.find("title").text,
-									   hour_count_source=hour_count_source)
-						sl.save()
-						break
+			if link not in hour_count_source.hour_count.story.todays_links_urls():
+				try:
+					html = str(opener.open(link).read()).lower().decode('utf-8')
+				except BadStatusLine:
+					html = ""
+				except UnicodeDecodeError:
+					html = ""
+				if hour_count_source.source.start_text in html:
+					html = html.split(hour_count_source.source.start_text, 1)[1]
+				if hour_count_source.source.end_text in html:
+					html = html.split(hour_count_source.source.end_text, 1)[0]
+				print link
+				if html != "":
+					for kw in hour_count_source.hour_count.story.keywords():
+						if " " + kw.keyword in html:
+							count += 1
+							print kw.keyword
+							# add as StoryLink
+							sl = StoryLink(url=link,
+										   date=the_time,
+										   title=item.find("title").text,
+										   hour_count_source=hour_count_source)
+							sl.save()
+							break
 	hour_count_source.count = count
 	hour_count_source.save()
 
@@ -63,7 +64,7 @@ def in_last_hour(the_time):
 		if the_time.month == t.month:
 			if the_time.day == t.day:
 				if the_time.hour == t.hour:
-					return True
+					return False
 				if the_time.hour == t.hour-1:
 					return True
 			if  the_time.day == t.day-1:
