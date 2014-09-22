@@ -32,7 +32,7 @@ class Headline(models.Model):
 
 class StoryLink(models.Model):
 	title = models.CharField(max_length=200)
-	url = models.CharField(max_length=200)
+	url = models.CharField(max_length=400)
 	hour_count_source = models.ForeignKey('HourCountSource')
 	date = models.DateTimeField(blank=True,null=True)
 
