@@ -1,7 +1,9 @@
 import datetime
 
 from django.shortcuts import render
-from story.models import Story, Keyword, Headline, HeadlineLink, HourCount
+from story.models import Story, Keyword, Headline, HeadlineLink, HourCount, StoryLink
+from django.views.generic import TemplateView
+from chartjs.views.lines import BaseLineChartView	
 
 # Create your views here.
 
@@ -9,6 +11,13 @@ def story(request, slug):
 	context = {}
 	if len(Story.objects.filter(slug=slug)):
 		context["story"] = Story.objects.get(slug=slug)
+		start_time = datetime.datetime.now() + datetime.timedelta(hours=-24)
+		start_time = start_time.replace(minute=0, second=0)
+		hours = HourCount.objects.filter(story=context["story"], date__gte=start_time)
+		hours_reference = [0]*24
+		for hour in hours:
+			hours_reference[(hour.date.hour-start_time.hour-1)%24] = hour
+		context["hours"] = hours_reference
 	else:
 		context["error"] = "Not Found"
 
@@ -27,15 +36,11 @@ def headline(request, slug, headline):
 
 	return render(request, 'story/headline.html', context)
 
-from django.views.generic import TemplateView
-from chartjs.views.lines import BaseLineChartView
-
-import pdb;
 class LineChartJSONView(BaseLineChartView):
     def get_labels(self):
     	current_hour = datetime.datetime.now().hour
     	labels = []
-    	for hour in range(0,24):
+    	for hour in range(0	,24):
     		if (current_hour+hour)%24 <= 12:
     			labels.append(str((current_hour+hour)%24) + " am")
     		else:

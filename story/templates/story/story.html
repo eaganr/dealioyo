@@ -10,15 +10,58 @@
 		<div class="not-found">No Story With This Name</div>
 	{% endif %}
 
-	<canvas id="myChart" width="500" height="400"></canvas>
+	<canvas id="myChart" width="800" height="400"></canvas>
+
+	<table id="linksTable">
+		{% for hour in hours %}
+			{% for source in hour.hour_count_sources %}
+				{% for link in source.get_links %}
+					<tr class="link-row" index="{{forloop.parentloop.parentloop.counter|add:"-1"}}">
+						<td>{{link.date}}</td>
+						<td><a href="{{link.url}}">{{link.title}}</a></td>
+					</tr>
+				{% endfor %}
+			{% endfor %}
+		{% endfor %}
+	</table>
 
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
-    <script type="text/javascript" src="/static/Chart.min.js"></script>
+    <script type="text/javascript" src="/static/Chart.js"></script>
     <script type="text/javascript">
+    	var lineChart;
         $.get("/story/line_chart/json", function(data) {
             var ctx = $("#myChart").get(0).getContext("2d");
-            new Chart(ctx).Line(data);
+            lineChart = new Chart(ctx).Line(data);
+            var totalPoints = lineChart.datasets[0].points.length;
+            lineChart.datasets[0].points[totalPoints-1].fillColor = "red";
+	    	lineChart.datasets[0].points[totalPoints-1].highlightFill = "red";
+	    	lineChart.update();
+	    	$(".link-row").hide();
         });
+
+        var theChart = document.getElementById("myChart");
+	    theChart.onclick = function(evt) {
+	    	$(".link-row").hide();
+	    	activePoints = lineChart.getPointsAtEvent(evt);
+	    	for(var i=0;i<lineChart.datasets[0].points.length;i++) {
+	    		if(lineChart.datasets[0].points[i].label == activePoints[0].label) {
+	    			lineChart.datasets[0].points[i].fillColor = "red";
+	    			lineChart.datasets[0].points[i].highlightFill = "red";
+
+	    			//show links associated with area
+	    			$(".link-row").each(function() {
+	    				if($(this).attr("index") == i) {
+	    					$(this).show();
+	    				}
+	    			});
+	    		}
+	    		else {
+	    			lineChart.datasets[0].points[i].fillColor = "rgba(203, 202, 198, 1)";
+	    			lineChart.datasets[0].points[i].highlightFill = "rgba(203, 202, 198, 1)";
+	    		}
+	    	}
+	    	lineChart.update();
+		};
     </script>
 
 

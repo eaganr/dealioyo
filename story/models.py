@@ -82,3 +82,6 @@ class HourCountSource(models.Model):
 	hour_count = models.ForeignKey('HourCount')
 	source = models.ForeignKey('Source')
 	count = models.IntegerField()
+
+	def get_links(self):
+		return StoryLink.objects.filter(hour_count_source=self)
