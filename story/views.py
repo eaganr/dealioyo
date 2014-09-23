@@ -51,7 +51,7 @@ class LineChartJSONView(BaseLineChartView):
     		start_time = start_time.replace(minute=0, second=0)
     		hours = HourCount.objects.filter(story=story, date__gte=start_time)
     		for hour in hours:
-    			sub_data[(hour.date.hour-start_time.hour)%24] = hour.count()
+    			sub_data[(hour.date.hour-start_time.hour-1)%24] = hour.count()
     		data.append(sub_data)
 		return data
 
