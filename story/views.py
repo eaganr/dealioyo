@@ -34,11 +34,11 @@ def story_chart(request, slug):
 			context["links"] = links
 		if mode == "week":
 			links = [[] for x in xrange(7)]
-			start_time = datetime.datetime.now() + datetime.timedelta(days=-7)
+			start_time = datetime.datetime.now() + datetime.timedelta(days=-6)
 			start_time = start_time.replace(hour=0, minute=0, second=0)
 			hours = HourCount.objects.filter(story=context["story"], date__gte=start_time)
 			for hour in hours:
-				links[(hour.date.weekday()-start_time.weekday()-1)%7].append(hour)
+				links[(hour.date.day-start_time.day)%7].append(hour)
 			context["links"] = links
 		if mode == "month":
 			#labels
