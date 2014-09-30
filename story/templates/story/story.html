@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
+	<script>
+		function changeChart(mode) {
+			$("#chartFrame").attr("src", "chart?mode="+mode);
+		}
+	</script>
+
 	{% if story %}
 		<div class="story-title">{{story.title}}</div>
 		<div class="story-date">{{story.start_date}}</div>
@@ -9,8 +15,11 @@
 	{% else %}
 		<div class="not-found">No Story With This Name</div>
 	{% endif %}
+	<button onclick="changeChart('day')">Day</button>
+	<button onclick="changeChart('week')">Week</button>
+	<button onclick="changeChart('month')">Month</button>
+	<iframe id="chartFrame" src="chart" width="810" height="460" frameborder="0" scrolling="no"></iframe>
 
-	<iframe src="chart" width="810" height="460" frameborder="0" scrolling="no"></iframe>
 
 
 {% endblock %}
