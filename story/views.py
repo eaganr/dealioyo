@@ -30,7 +30,7 @@ def story_chart(request, slug):
 			hours = HourCount.objects.filter(story=context["story"], date__gte=start_time)
 			links = [[] for x in xrange(24)] 
 			for hour in hours:
-				links[(hour.date.hour-start_time.hour-1)%24].append(hour)
+				links[(hour.date.hour-start_time.hour)%24].append(hour)
 			context["links"] = links
 		if mode == "week":
 			links = [[] for x in xrange(7)]
@@ -116,7 +116,7 @@ def line_json(request):
 		start_time = start_time.replace(minute=0, second=0)
 		hours = HourCount.objects.filter(story=story, date__gte=start_time)
 		for hour in hours:
-			data[(hour.date.hour-start_time.hour-1)%24] += hour.count()
+			data[(hour.date.hour-start_time.hour)%24] += hour.count()
 		datasets["data"] = data
 	
 	if mode == "week":

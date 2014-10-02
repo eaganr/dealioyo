@@ -11,11 +11,10 @@ from cookielib import CookieJar
 from story.models import Story, StoryLink, Source, HourCount, HourCountSource
 
 #return articles mentioning story keywords
-def count_rss(hour_count_source):
+def count_rss(hour_count_source, rss):
 	cj = CookieJar()
 	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
-	rss = str(urllib2.urlopen(hour_count_source.source.rss_url).read())
 	soup = BeautifulSoup(rss)
 	count = 0
 	for item in soup.find_all("item"):
@@ -66,12 +65,12 @@ def in_last_hour(the_time):
 			if the_time.day == t.day:
 				if the_time.hour == t.hour:
 					return False
-				if the_time.hour == t.hour-1:
+				if (t.hour-the_time.hour)%24 == 1:
 					return True
-			if  the_time.day == t.day-1:
+			if (t.hour-the_time.hour)%24 == 1:
 				if the_time.hour == 23 and t.hour == 0:
 					return True
-		if the_time.month == t.month-1:
+		if (t.month-the_time.month)%12 == 1:
 			if the_time.day == calendar.monthrange(the_time.year,the_time.month)[1] and t.day == 1:
 				if the_time.hour == 23 and t.hour == 0:
 					return True
@@ -85,13 +84,16 @@ def in_last_hour(the_time):
 # cron job
 def test():
 	t = datetime.datetime.now()
+	rss_data = {}
 	for story in Story.objects.all():
 		hc = HourCount(story=story, date=t)
 		hc.save()
 		for source in Source.objects.all():
+			if source.pk not in rss_data:
+				rss_data[source.pk] = str(urllib2.urlopen(hour_count_source.source.rss_url).read())
 			hcs = HourCountSource(hour_count=hc, source=source, count=0)
 			hcs.save()
-			count_rss(hcs)
+			count_rss(hcs, rss_data[source.pk])
 
 """
 def twitter_results(keyword, date_from, date_to):
