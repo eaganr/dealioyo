@@ -46,8 +46,9 @@ class Command(BaseCommand):
 				last24 = start_time = datetime.datetime.now() + datetime.timedelta(hours=-24)
 				if in_last_hour(the_time):
 					link = item.find("link").text
-					if link not in StoryLink.objects.filter(date__gte=last24).values_list("url"):
-						if item.find("title").text not in StoryLink.objects.filter(date__gte=last24).values_list("title"):
+					title = item.find("title").text
+					if len(StoryLink.objects.filter(date__gte=last24, url=link)) == 0:
+						if len(StoryLink.objects.filter(date__gte=last24, title=title)) == 0:
 							try:
 								html = str(opener.open(link).read()).lower().decode('utf-8')
 							except BadStatusLine:
@@ -58,20 +59,22 @@ class Command(BaseCommand):
 								html = html.split(source.start_text, 1)[1]
 							if source.end_text in html:
 								html = html.split(source.end_text, 1)[0]
-							print link
 							if html != "":
-								stories_used = []
-								for kw in Keyword.objects.all():
-									if " " + kw.keyword in html and kw.story.pk not in stories_used:
-										hcs = HourCountSource.objects.filter(source=source,
-																		  	 hour_count__story=kw.story,
-																		  	 hour_count__date=t)[0]
-										hcs.count += 1
-										hcs.save()
-										stories_used.append(kw.story.pk)
-										# add as StoryLink
-										sl = StoryLink(url=link,
-													   date=the_time,
-													   title=item.find("title").text,
-													   hour_count_source=hcs)
-										sl.save()
+								for story in Story.objects.all():
+									for kw in Keyword.objects.filter(story=story):
+										if " " + kw.keyword in html:
+											hcs = HourCountSource.objects.filter(source=source,
+																			  	 hour_count__story=kw.story,
+																			  	 hour_count__date=t)[0]
+											hcs.count += 1
+											hcs.save()
+											print link
+											print kw.keyword
+											print hcs.count
+											# add as StoryLink
+											sl = StoryLink(url=link,
+														   date=the_time,
+														   title=item.find("title").text,
+														   hour_count_source=hcs)
+											sl.save()
+											break
