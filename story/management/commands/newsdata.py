@@ -47,30 +47,31 @@ class Command(BaseCommand):
 				if in_last_hour(the_time):
 					link = item.find("link").text
 					if link not in StoryLink.objects.filter(date__gte=last24).values_list("url"):
-						try:
-							html = str(opener.open(link).read()).lower().decode('utf-8')
-						except BadStatusLine:
-							html = ""
-						except UnicodeDecodeError:
-							html = ""
-						if source.start_text in html:
-							html = html.split(source.start_text, 1)[1]
-						if source.end_text in html:
-							html = html.split(source.end_text, 1)[0]
-						print link
-						if html != "":
-							stories_used = []
-							for kw in Keyword.objects.all():
-								if " " + kw.keyword in html and kw.story.pk not in stories_used:
-									hcs = HourCountSource.objects.filter(source=source,
-																	  	 hour_count__story=kw.story,
-																	  	 hour_count__date=t)[0]
-									hcs.count += 1
-									hcs.save()
-									stories_used.append(kw.story.pk)
-									# add as StoryLink
-									sl = StoryLink(url=link,
-												   date=the_time,
-												   title=item.find("title").text,
-												   hour_count_source=hcs)
-									sl.save()
+						if item.find("title").text not in StoryLink.objects.filter(date__gte=last24).values_list("title"):
+							try:
+								html = str(opener.open(link).read()).lower().decode('utf-8')
+							except BadStatusLine:
+								html = ""
+							except UnicodeDecodeError:
+								html = ""
+							if source.start_text in html:
+								html = html.split(source.start_text, 1)[1]
+							if source.end_text in html:
+								html = html.split(source.end_text, 1)[0]
+							print link
+							if html != "":
+								stories_used = []
+								for kw in Keyword.objects.all():
+									if " " + kw.keyword in html and kw.story.pk not in stories_used:
+										hcs = HourCountSource.objects.filter(source=source,
+																		  	 hour_count__story=kw.story,
+																		  	 hour_count__date=t)[0]
+										hcs.count += 1
+										hcs.save()
+										stories_used.append(kw.story.pk)
+										# add as StoryLink
+										sl = StoryLink(url=link,
+													   date=the_time,
+													   title=item.find("title").text,
+													   hour_count_source=hcs)
+										sl.save()
