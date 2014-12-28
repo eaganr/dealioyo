@@ -72,7 +72,6 @@ def story_chart(request, slug):
 
 def headline(request, slug, headline):
 	context = {}
-	return LineChartJSONView.as_view()
 	if len(Story.objects.filter(slug=slug)):
 		story = Story.objects.get(slug=slug)
 		context["story"] = story
@@ -82,6 +81,57 @@ def headline(request, slug, headline):
 		context["error"] = "Not Found"
 
 	return render(request, 'story/headline.html', context)
+
+def story_links(request, slug):
+	context = {}
+	context["story"] = Story.objects.get(slug=slug)
+	if request.method == "GET":
+		date = request.GET["date"]
+		mode = request.GET["mode"]
+		start_value = int(request.GET["start_value"])
+
+		current_date = datetime.datetime.now()
+		hours = [];
+		if mode == "day":
+			hour = int(date.split(" ", 1)[0])
+			period = date.split(" ", 1)[1]
+			if period == "pm":
+				hour += 12
+			search_date = datetime.datetime(current_date.year,
+											 current_date.month,
+											 current_date.day,
+											 hour)
+			if hour > current_date.hour:
+				search_date = search_date + datetime.timedelta(hours=-24)
+
+			hours = HourCount.objects.filter(story=context["story"],
+											 date__range=[search_date,search_date + datetime.timedelta(hours=1)])
+		if mode == "week" or mode == "month":
+			day = 0
+			if mode == "week":
+				day = int(date.split(" ", 1)[1])
+			if mode == "month":
+				day = int(date.split(" ", 1)[0])
+			month = current_date.month
+			year = current_date.year
+			if day > current_date.day:
+				month = current_date.month - 1
+				if month == 0:
+					month = 12
+					year -= 1
+
+			search_date = datetime.datetime(year, month, day, 0)
+			hours = HourCount.objects.filter(story=context["story"],
+											 date__range=[search_date,search_date + datetime.timedelta(hours=24)])
+		links = []
+		for hour in hours:
+			for hcs in hour.hour_count_sources():
+				for link in hcs.get_links():
+					links.append(link)
+		context["links"] = links[start_value:5]
+
+	return render(request, 'story/story_links.html', context)
+
 
 
 def line_json(request):

@@ -3,9 +3,19 @@
 {% block content %}
 	{% if headline %}
 		<div class="story-title">{{story.title}}</div>
-		<div class="headline-title">{{headline.title}}</div>
+		<h1 class="headline-title">{{headline.title}}</h1>
 		<div class="headline-date">{{headline.date}}</div>
 		<div class="headline-description">{{headline.description|linebreaksbr}}</div>
+		<div class="headline-links">
+			<h3>Headline Links</h3>
+			<table class="headline-links-table">
+			{% for link in headline.links %}
+				<tr>
+					<td><a href="{{link.link.url}}">{{link.link.title}}</a></td>
+				</tr>
+			{% endfor %}
+			</table>
+		</div>
 		{% include "story/timeline.html" %}
 	{% else %}
 		<div class="not-found">No Story With This Name</div>

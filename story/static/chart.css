@@ -1,0 +1,25 @@
+.mode-button {
+	width:30%;
+	position: relative;
+	margin: 0 auto;
+}
+
+.mode-buttons {
+	width:50%;
+	margin: 0 auto;
+}
+
+.chart {
+	position: relative;
+	display:block;
+	width:80%;
+	margin: 0 auto;
+}
+
+body {
+	margin:0;padding:0;
+}
+
+@media only screen and (max-width: 650px) {
+
+}

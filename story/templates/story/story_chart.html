@@ -2,82 +2,137 @@
 	<head>
 		<script type="text/javascript" src="/static/jquery.min.js"></script>
 	    <script type="text/javascript" src="/static/Chart.js"></script>
+	    <link rel="stylesheet" type="text/css" href="/static/chart.css">
 	    <script type="text/javascript">
-	    	$(document).ready(function() {
-	    		$("#myChart").attr("width", 800);
-	    		$("#myChart").attr("height", 400);
+	    	var mode = "{{mode}}";
+	    	var modeRange = {% if mode == "day" %}23{% elif mode == "week" %}6{% elif mode == "month" %}30{% endif %};
+	    	var dayChart;
+	    	var weekChart;
+	    	var monthChart;
 
-		    	var lineChart;
-		        $.get("/story/line_chart/json?story={{story.pk}}&mode={{mode}}", function(data) {
-		            var ctx = $("#myChart").get(0).getContext("2d");
-		            lineChart = new Chart(ctx).Line(data);
-		            var totalPoints = lineChart.datasets[0].points.length;
-		            lineChart.datasets[0].points[totalPoints-1].fillColor = "rgba(43,143,243,1)";
-			    	lineChart.datasets[0].points[totalPoints-1].highlightFill = "rgba(43,143,243,1)";
-			    	lineChart.update();
+
+
+	    	$(document).ready(function() {
+	    		$("#dayChart").attr("width", getWidth());
+	    		$("#dayChart").attr("height", 400);
+	    		$("#weekChart").attr("width", getWidth());
+	    		$("#weekChart").attr("height", 400);
+	    		$("#monthChart").attr("width", getWidth());
+	    		$("#monthChart").attr("height", 400);
+	    		updateChart("day", dayChart);
+	    		updateChart("week", weekChart);
+	    		updateChart("month", monthChart);
+	    		$("canvas").hide();
+	    		$("#"+mode+"Chart").show();
+
+		        // click on data points to show articles
+		        var modes = ["day", "week", "month"];
+		        for(var i=0;i<modes.length;i++) {
+		        	var aMode = modes[i];
+		        	var theChart = document.getElementById(aMode+"Chart");
+				    theChart.onclick = function(evt) {
+				    	var lineChart;
+				    	if(mode == "day") lineChart = dayChart;
+				    	if(mode == "week") lineChart = weekChart;
+				    	if(mode == "month") lineChart = monthChart;
+				    	activePoints = lineChart.getPointsAtEvent(evt);
+				    	if(activePoints.length > 0) {
+				    		$(".link-row").hide();
+					    	for(var i=0;i<lineChart.datasets[0].points.length;i++) {
+					    		if(lineChart.datasets[0].points[i].label == activePoints[0].label) {
+					    			lineChart.datasets[0].points[i].fillColor = normalRGB();
+					    			lineChart.datasets[0].points[i].highlightFill = normalRGB();
+					    			updateLinks(activePoints[0].label, 0);
+					    			//show links associated with area
+					    			$(".link-row").each(function() {
+					    				if($(this).attr("index") == i) {
+					    					$(this).show();
+					    				}
+					    			});
+					    		}
+					    		else {
+					    			lineChart.datasets[0].points[i].fillColor = highlightedRGB();
+					    			lineChart.datasets[0].points[i].highlightFill = highlightedRGB();
+					    		}
+					    	}
+					    	lineChart.update();
+					    }
+					};
+		        }
+			});
+
+			function updateLinks(theLabel, startValue) {
+				$.get("links?mode="+mode+"&date="+theLabel+"&start_value="+startValue, function(data) {
+					$("#linksTable").html(data);
+				});
+			}
+
+			function updateChart(theMode) {
+				$.get("/story/line_chart/json?story={{story.pk}}&mode="+theMode, function(data) {	
+		            var ctx = $("#"+theMode+"Chart").get(0).getContext("2d");
+		            ctx.canvas.width = getWidth();
+					ctx.canvas.height = 400;
+		            if(theChart) theChart.destroy();
+		            var theChart = new Chart(ctx).Line(data);
+		            var totalPoints = theChart.datasets[0].points.length;
+		            theChart.datasets[0].points[totalPoints-1].fillColor = normalRGB();
+			    	theChart.datasets[0].points[totalPoints-1].highlightFill = normalRGB();
+			    	theChart.update();
+			    	if(theMode == "day") dayChart = theChart;
+			    	if(theMode == "week") weekChart = theChart;
+			    	if(theMode == "month") monthChart = theChart;
 			    	$(".link-row").hide();
 			    	$(".link-row").each(function() {
-	    				if($(this).attr("index") == {% if mode == "day" %}23{% elif mode == "week" %}6{% elif mode == "month" %}30{% endif %}) {
+	    				if($(this).attr("index") == modeRange) {
 	    					$(this).show();
 	    				}
 	    			});
+	    			$("#"+theMode+"Chart").width(getWidth());
+	    			$("#"+theMode+"Chart").height(400);
 		        });
+			}
+			function changeMode(newMode) {
+				mode = newMode;
+				$("canvas").hide();
+				$("#"+newMode+"Chart").css({display:"block"})
+			}
 
-		        var theChart = document.getElementById("myChart");
-			    theChart.onclick = function(evt) {
-			    	activePoints = lineChart.getPointsAtEvent(evt);
-			    	if(activePoints.length > 0) {
-			    		$(".link-row").hide();
-				    	for(var i=0;i<lineChart.datasets[0].points.length;i++) {
-				    		if(lineChart.datasets[0].points[i].label == activePoints[0].label) {
-				    			lineChart.datasets[0].points[i].fillColor = "rgba(43,143,243,1)";
-				    			lineChart.datasets[0].points[i].highlightFill = "rgba(43,143,243,1)";
+			function getWidth() {
+				return $(window).width()*0.8;
+			}
 
-				    			//show links associated with area
-				    			$(".link-row").each(function() {
-				    				if($(this).attr("index") == i) {
-				    					$(this).show();
-				    				}
-				    			});
-				    		}
-				    		else {
-				    			lineChart.datasets[0].points[i].fillColor = "rgba(203, 202, 198, 1)";
-				    			lineChart.datasets[0].points[i].highlightFill = "rgba(203, 202, 198, 1)";
-				    		}
-				    	}
-				    	lineChart.update();
-				    }
-				};
-			});
+			function normalRGB() {
+				return "rgba(43,143,243,1)";
+			}
+
+			function highlightedRGB() {
+				return "rgba(203, 202, 198, 1)";
+			}
+
 	    </script>
 	    <style>
 	    	body {
 	    		width:100%;
 	    	}
-		    #myChart {
-		    	width:10px;
-		    }
 	    </style>
 	</head>
 
 	<body>
-		<canvas id="myChart"></canvas>
-			<div style="height:55px;width:800px;overflow:scroll;">
+		<div class="mode-buttons">
+			<button class="mode-button" onclick="changeMode('day')">Day</button>
+			<button class="mode-button" onclick="changeMode('week')">Week</button>
+			<button class="mode-button" onclick="changeMode('month')">Month</button>
+		</div>
+
+		<canvas class="chart" id="dayChart"></canvas>
+		<canvas class="chart" id="weekChart" style="display:none;"></canvas>
+		<canvas class="chart" id="monthChart" style="display:none;"></canvas>
+
+		<div id="links" style="width:800px;overflow:visible">
 			<table id="linksTable">
-				{% for hour_list in links %}
-					{% for hour in hour_list %}
-						{% for source in hour.hour_count_sources %}
-							{% for link in source.get_links %}
-								<tr class="link-row" index="{{forloop.parentloop.parentloop.parentloop.counter|add:"-1"}}">
-									<td>{{link.date}}</td>
-									<td><a href="{{link.url}}" target="_parent">{{link.title}}</a></td>
-								</tr>
-							{% endfor %}
-						{% endfor %}
-					{% endfor %}
-				{% endfor %}
+
 			</table>
-			</div>
+		</div>
 
     </body>
 </html

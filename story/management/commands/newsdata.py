@@ -78,3 +78,6 @@ class Command(BaseCommand):
 														   hour_count_source=hcs)
 											sl.save()
 											break
+					else:
+						#if not on last hour then go to next source
+						break

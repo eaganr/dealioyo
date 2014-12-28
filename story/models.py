@@ -11,7 +11,7 @@ class Story(models.Model):
 	slug = models.CharField(max_length=50)
 
 	def headlines(self):
-		return Headline.objects.filter(story=self)
+		return Headline.objects.filter(story=self).order_by("date")
 
 	def keywords(self):
 		return Keyword.objects.filter(story=self)
@@ -51,9 +51,9 @@ class StoryLink(models.Model):
 	date = models.DateTimeField(blank=True,null=True)
 
 
-class HeadlineLink(StoryLink):
+class HeadlineLink(models.Model):
 	headline = models.ForeignKey('Headline')
-	
+	link = models.ForeignKey('StoryLink')
 
 class Source(models.Model):
 	name = models.CharField(max_length=100)
