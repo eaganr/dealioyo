@@ -13,11 +13,9 @@
 
 
 	    	$(document).ready(function() {
-	    		$("#dayChart").attr("width", getWidth());
+	    		changeWidth();
 	    		$("#dayChart").attr("height", 400);
-	    		$("#weekChart").attr("width", getWidth());
 	    		$("#weekChart").attr("height", 400);
-	    		$("#monthChart").attr("width", getWidth());
 	    		$("#monthChart").attr("height", 400);
 	    		updateChart("day", dayChart);
 	    		updateChart("week", weekChart);
@@ -55,6 +53,7 @@
 					    			lineChart.datasets[0].points[i].highlightFill = highlightedRGB();
 					    		}
 					    	}
+					    	$(window.parent.document.getElementById('chartFrame')).height($("body").height());
 					    	lineChart.update();
 					    }
 					};
@@ -73,7 +72,7 @@
 		            ctx.canvas.width = getWidth();
 					ctx.canvas.height = 400;
 		            if(theChart) theChart.destroy();
-		            var theChart = new Chart(ctx).Line(data);
+		            var theChart = new Chart(ctx).Line(data,{animation: false});
 		            var totalPoints = theChart.datasets[0].points.length;
 		            theChart.datasets[0].points[totalPoints-1].fillColor = normalRGB();
 			    	theChart.datasets[0].points[totalPoints-1].highlightFill = normalRGB();
@@ -94,11 +93,21 @@
 			function changeMode(newMode) {
 				mode = newMode;
 				$("canvas").hide();
-				$("#"+newMode+"Chart").css({display:"block"})
+				$("#"+newMode+"Chart").css({display:"block"});
 			}
 
 			function getWidth() {
 				return $(window).width()*0.8;
+			}
+
+			function changeWidth() {
+				$("#dayChart").attr("width", getWidth());
+				$("#weekChart").attr("width", getWidth());
+				$("#monthChart").attr("width", getWidth());
+	            $("#dayChart").get(0).getContext("2d").canvas.width = getWidth();
+	            $("#weekChart").get(0).getContext("2d").canvas.width = getWidth();
+	            $("#monthChart").get(0).getContext("2d").canvas.width = getWidth();
+	            $("#links").attr("width", getWidth());
 			}
 
 			function normalRGB() {
@@ -128,7 +137,7 @@
 		<canvas class="chart" id="weekChart" style="display:none;"></canvas>
 		<canvas class="chart" id="monthChart" style="display:none;"></canvas>
 
-		<div id="links" style="width:800px;overflow:visible">
+		<div id="links" style="overflow:visible">
 			<table id="linksTable">
 
 			</table>

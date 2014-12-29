@@ -1,10 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-	<link rel="stylesheet" type="text/css" href="/static/chart.css">
-{% endblock %}
-
-{% block content %}
+	<link rel="stylesheet" type="text/css" href="/static/story.css">
 
 	<script>
 		var dayHtml = "";
@@ -17,18 +14,36 @@
 		}
 
 		$(document).ready(function() {
-			$("#chartFrame").width($(window).width());
+			$("#chartFrame").width($(window).width()*0.74);
+			$(".timeline-container").height($(window).height()-45);
 		});
+
+		$(window).resize(function() {
+			$("#chartFrame").width($(window).width());
+			$(".timeline-container").height($(window).height()-45);
+		});
+
+		function frameHeight() {
+
+		}
 
 	</script>
 
-	{% if story %}
-		<div class="story-title">{{story.title}}</div>
-		<div class="story-date">{{story.start_date}}</div>
-		<iframe id="chartFrame" src="chart" width="810" height="460" frameborder="0" scrolling="no"></iframe>
+{% endblock %}
 
-		<div class="story-description">{{story.description|linebreaksbr}}</div>
-		{% include "story/timeline.html" %}
+{% block content %}
+
+	{% if story %}
+		<div class="story-container">
+			<div class="story-title">{{story.title}}</div>
+			<div class="story-date">{{story.start_date}}</div>
+			<iframe id="chartFrame" src="chart" width="810" height="460" frameborder="0" scrolling="no"></iframe>
+			<div class="story-description">{{story.description|linebreaksbr}}</div>
+		</div>
+		
+		<div class="timeline-container">
+			{% include "story/timeline.html" %}
+		</div>
 	{% else %}
 		<div class="not-found">No Story With This Name</div>
 	{% endif %}
