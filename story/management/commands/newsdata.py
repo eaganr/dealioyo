@@ -62,7 +62,7 @@ class Command(BaseCommand):
 							if html != "":
 								for story in Story.objects.all():
 									for kw in Keyword.objects.filter(story=story):
-										if " " + kw.keyword in html and len(StoryLink.objects.filter(url=link) == 0:
+										if " " + kw.keyword in html and len(StoryLink.objects.filter(url=link)) == 0:
 											hcs = HourCountSource.objects.filter(source=source,
 																			  	 hour_count__story=kw.story,
 																			  	 hour_count__date=t)[0]
