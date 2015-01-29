@@ -17,6 +17,7 @@ class Story(models.Model):
 		return Keyword.objects.filter(story=self)
 
 	def todays_links(self):
+		print "yo"
 		start_time = datetime.datetime.now() + datetime.timedelta(hours=-24)
 		story_links = StoryLink.objects.filter(hour_count_source__hour_count__story=self, date__gt=start_time)
 		return story_links

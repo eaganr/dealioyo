@@ -1,20 +1,22 @@
 <div class="story-timeline">
-	<h3>{{story.title}} Timeline</h3>
+	<h3>The Rundown</h3>
 	<table class="timeline-table">
 	{% for headline in story.headlines %}
 		<tr>
-			<td>{% if headline.description %}
-				<a href="/story/{{story.slug}}/{{headline.pk}}/">
+			<td>
+				<div class="headline-date">
+					{{headline.date|date:"M"}}
+					<br />
+					{{headline.date.day}}
+				</div>
+				<div class="headline-title">
+				{% if headline.description %}
+				<a href="/story/{{story.slug}}/{{headline.pk}}/">{{headline.title}}</a>
+				{% else %}
+					{{headline.title}}
 				{% endif %}
-				{{headline.title}}
-				{% if headline.description %}</a>{% endif %}
+				</div>
 			</td>
-			<td>{{headline.date}}</td>
-			<td>
-			{% for link in headline.links %}
-				<a class="source-link" href="{{link.url}}">{{link.source}}</a>
-			{% endfor %}
-			<td>
 		</tr>
 	{% endfor %}
 	</table>

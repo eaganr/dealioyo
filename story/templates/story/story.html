@@ -19,13 +19,9 @@
 		});
 
 		$(window).resize(function() {
-			$("#chartFrame").width($(window).width());
+			//$("#chartFrame").width($(window).width());
 			$(".timeline-container").height($(window).height()-45);
 		});
-
-		function frameHeight() {
-
-		}
 
 	</script>
 
@@ -35,8 +31,9 @@
 
 	{% if story %}
 		<div class="story-container">
-			<div class="story-title">{{story.title}}</div>
-			<div class="story-date">{{story.start_date}}</div>
+			<h1 class="story-title">{{story.title}}</h1>
+			<div class="story-date">Beginning in {{story.start_date|date:"F Y"}}</div>
+			<br />
 			<iframe id="chartFrame" src="chart" width="810" height="460" frameborder="0" scrolling="no"></iframe>
 			<div class="story-description">{{story.description|linebreaksbr}}</div>
 		</div>

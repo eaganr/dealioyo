@@ -65,6 +65,8 @@ def story_chart(request, slug):
 						links[i].append(hour)
 			context["links"] = links
 		context["mode"] = mode
+		if "buttons" in request.GET:
+			context["buttons"] = request.GET["buttons"];
 	else:
 		context["error"] = "Not Found"
 
@@ -105,7 +107,7 @@ def story_links(request, slug):
 				search_date = search_date + datetime.timedelta(hours=-24)
 
 			hours = HourCount.objects.filter(story=context["story"],
-											 date__range=[search_date,search_date + datetime.timedelta(hours=1)])
+											 date__range=[search_date, search_date + datetime.timedelta(hours=1)])
 		if mode == "week" or mode == "month":
 			day = 0
 			if mode == "week":
@@ -123,15 +125,22 @@ def story_links(request, slug):
 			search_date = datetime.datetime(year, month, day, 0)
 			hours = HourCount.objects.filter(story=context["story"],
 											 date__range=[search_date,search_date + datetime.timedelta(hours=24)])
-		links = []
+		all_links = []
 		for hour in hours:
 			for hcs in hour.hour_count_sources():
 				for link in hcs.get_links():
-					links.append(link)
-		context["links"] = links[start_value:5]
+					all_links.append(link)
+		links = []
+		index = 0
+		increment = len(all_links) / 5
+		if increment == 0:
+			increment = 1
+		while len(links) < 5 and len(links) < len(all_links):
+			links.append(all_links[index])
+			index += increment
+		context["links"] = links
 
 	return render(request, 'story/story_links.html', context)
-
 
 
 def line_json(request):

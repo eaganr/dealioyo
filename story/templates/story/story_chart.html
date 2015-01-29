@@ -127,15 +127,17 @@
 	</head>
 
 	<body>
+		{% if buttons != "false" %}
 		<div class="mode-buttons">
-			<button class="mode-button" onclick="changeMode('day')">Day</button>
+			<button class="mode-button left-button" onclick="changeMode('day')">Day</button>
 			<button class="mode-button" onclick="changeMode('week')">Week</button>
-			<button class="mode-button" onclick="changeMode('month')">Month</button>
+			<button class="mode-button right-button" onclick="changeMode('month')">Month</button>
 		</div>
+		{% endif %}
 
-		<canvas class="chart" id="dayChart"></canvas>
-		<canvas class="chart" id="weekChart" style="display:none;"></canvas>
-		<canvas class="chart" id="monthChart" style="display:none;"></canvas>
+		<canvas class="chart {% if buttons == "false" %}no-border{% endif %}" id="dayChart"></canvas>
+		<canvas class="chart {% if buttons == "false" %}no-border{% endif %}" id="weekChart" style="display:none;"></canvas>
+		<canvas class="chart {% if buttons == "false" %}no-border{% endif %}" id="monthChart" style="display:none;"></canvas>
 
 		<div id="links" style="overflow:visible">
 			<table id="linksTable">
