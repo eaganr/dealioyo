@@ -1,0 +1,59 @@
+#chartFrame {
+	margin-left: auto;
+    margin-right: auto;
+	display: block;
+	width:80%;
+}
+
+.story-container {
+	position:absolute;
+	margin-left: 5%;
+	margin-right: 5%;
+	width:74%;
+	top:45px;
+}
+ 
+.timeline-container {
+	position: fixed;
+	right:0px;
+	top:45px;
+	width:200px;
+	background-color: #E0E0E0;
+	overflow: scroll;
+}
+
+.story-timeline h3 {
+	font-family:'lucida grande',tahoma,verdana,arial,sans-serif;
+	text-align: center;
+}
+
+.story-date {
+	color:#9197a3;
+	font-family: 'lucida grande',tahoma,verdana,arial,sans-serif;
+	font-size: 10px;
+	text-align: center;
+}
+
+.story-title {
+	font-family: "tablet-gothic-condensed","Arial Narrow","Helvetica Neue",Helvetica,Arial,sans-serif;
+	text-align: center;
+}
+
+.timeline-table {
+	width:100%;
+}
+
+.headline-date {
+
+}
+
+.headline-title {
+	position: absolute;
+	top:0px;
+	left:30px;
+}
+
+.timeline-table td {
+	border-bottom: solid;
+	position: relative;
+}

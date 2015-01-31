@@ -1,0 +1,67 @@
+.mode-button {
+	width:30%;
+	height:30px;
+	position: relative;
+	margin: 0 auto;
+	background-color:#DADADA;
+	border-top: solid;
+	border-bottom:none;
+	border-color:black;
+	border-width: 2px;
+}
+
+.mode-button:hover {
+	background-color: #CACACA;
+}
+
+.mode-button:focus {
+    outline: none;
+}
+
+.left-button {
+	left:4px;
+	border-width: 2px;
+	border-left: solid;
+	border-right:none;
+	border-top-left-radius: 5px;
+}
+
+.right-button {
+	right:4px;
+	border-width: 2px;
+	border-right:solid;
+	border-left:none;
+	border-top-right-radius: 5px;
+}
+
+.mode-buttons {
+	width:50%;
+	margin: 0 auto;
+}
+
+.chart {
+	position: relative;
+	display:block;
+	width:80%;
+	margin: 0 auto;
+	border-top:solid;
+	border-color:black;
+}
+
+.no-border {
+	border-top:none;
+}
+
+#links {
+	width:80%;
+	display: block;
+	margin: 0 auto;
+}
+
+body {
+	margin:0;padding:0;
+}
+
+@media only screen and (max-width: 650px) {
+
+}
