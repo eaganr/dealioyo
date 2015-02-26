@@ -99,11 +99,13 @@ def story_links(request, slug):
 			period = date.split(" ", 1)[1]
 			if period == "pm":
 				hour += 12
+			if hour == 23:
+				hour = -1
 			search_date = datetime.datetime(current_date.year,
 											 current_date.month,
 											 current_date.day,
-											 hour)
-			if hour > current_date.hour:
+											 hour+1)
+			if hour >= current_date.hour:
 				search_date = search_date + datetime.timedelta(hours=-24)
 
 			hours = HourCount.objects.filter(story=context["story"],
@@ -116,7 +118,7 @@ def story_links(request, slug):
 				day = int(date.split(" ", 1)[0])
 			month = current_date.month
 			year = current_date.year
-			if day > current_date.day:
+			if day >= current_date.day:
 				month = current_date.month - 1
 				if month == 0:
 					month = 12
