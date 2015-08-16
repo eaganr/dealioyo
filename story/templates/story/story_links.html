@@ -1,7 +1,7 @@
 {{mode}}
 {% for link in links %}
 	<tr>
-		<td><a href="{{link.url}}">{{link.title}}</a></td>
+		<td><a target="_parent" href="{{link.url}}">{{link.title}}</a></td>
 		<td>{{link.date}}</td>
 	</tr>
 {% endfor %}
