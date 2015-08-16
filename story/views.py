@@ -7,6 +7,11 @@ from story.models import Story, Keyword, Headline, HeadlineLink, HourCount, Stor
 
 # Create your views here.
 
+def story_index(request):
+	context = {}
+	context["stories"]=Story.objects.all()
+	return render(request, 'story/story_index.html',context)
+
 def story(request, slug):
 	context = {}
 	if len(Story.objects.filter(slug=slug)):

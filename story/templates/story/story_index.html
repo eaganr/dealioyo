@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+	<ul style="position:relative;top:100px;">
+	{% for story in stories %}
+		<li><a href="{{story.slug}}">{{story.title}}</a></li>
+	{% endfor %}
+	</ul>
+{% endblock %}
