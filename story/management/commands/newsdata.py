@@ -64,9 +64,9 @@ class Command(BaseCommand):
 								for story in Story.objects.all():
 									for kw in Keyword.objects.filter(story=story):
 										kwFound = False
-										if kw.keyword in item.find("description").text:
+										if " " + kw.keyword in item.find("description").text or kw.keyword + " " in item.find("description").text
 											kwFound = True
-										if kw.keyword in item.find("title").text:
+										if " " + kw.keyword in item.find("title").text or kw.keyword + " " in item.find("title").text
 											kwFound = True
 										
 										if kwFound:
