@@ -47,7 +47,7 @@ class Command(BaseCommand):
 				if in_last_hour(the_time):
 					link = item.find("link").text
 					title = item.find("title").text
-					if len(StoryLink.objects.filter(date__gte=last24, url=link)) == 0:
+					if len(StoryLink.objects.filter(date__gte=last24, url=link)) == 0 and len(StoryLink.objects.filter(url=link)) == 0:
 						if len(StoryLink.objects.filter(date__gte=last24, title=title)) == 0:
 							try:
 								html = str(opener.open(link).read()).lower().decode('utf-8')
@@ -62,7 +62,13 @@ class Command(BaseCommand):
 							if html != "":
 								for story in Story.objects.all():
 									for kw in Keyword.objects.filter(story=story):
-										if " " + kw.keyword in html and len(StoryLink.objects.filter(url=link)) == 0:
+										kwFound = False
+										if " " + kw.keyword in item.find("description").text or kw.keyword + " " in item.find("description").text:
+											kwFound = True
+										if " " + kw.keyword in item.find("title").text or kw.keyword + " " in item.find("title").text:
+											kwFound = True
+										
+										if kwFound:
 											hcs = HourCountSource.objects.filter(source=source,
 																			  	 hour_count__story=kw.story,
 																			  	 hour_count__date=t)[0]
